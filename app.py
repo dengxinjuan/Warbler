@@ -1,4 +1,4 @@
-import os
+import os 
 
 from flask import Flask, render_template, request, flash, redirect, session, g, abort
 from flask_debugtoolbar import DebugToolbarExtension
@@ -212,6 +212,7 @@ def stop_following(follow_id):
 
 @app.route('/users/<int:user_id>/likes', methods=["GET"])
 def show_likes(user_id):
+    """we will show the users the likes, check authorize or not"""
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
@@ -242,8 +243,6 @@ def add_like(message_id):
     db.session.commit()
 
     return redirect("/")
-    
-
 
 @app.route('/users/profile', methods=["GET", "POST"])
 def edit_profile():
