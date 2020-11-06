@@ -1,4 +1,7 @@
-import os 
+"""this is the app for twitter clone"""
+
+
+import os
 from flask import Flask, render_template, request, flash, redirect, session, g, abort
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
