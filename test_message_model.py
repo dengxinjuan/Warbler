@@ -36,7 +36,3 @@ class UserModelTestCase(TestCase):
         db.session.rollback()
         return res
     
-    
-
-
-
