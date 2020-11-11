@@ -1,8 +1,5 @@
 import os
-
-
-
-
+from models import db,User,Message,Follows,Likes
 
 from unittest import TestCase
 #from sqlalchemy import exc
@@ -12,7 +9,7 @@ from app import app
 app.config['TESTING'] = True
 app.config['WTF_CSRF_ENABLED'] = False
 
-from models import db,User,Message,Follows,Likes
+
 
 os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
 
@@ -30,7 +27,7 @@ class UserModelTestCase(TestCase):
 
         self.u = User.query.get(self.uid)
         self.client = app.test_client()
-    
+
     def tearDown(self):
         res = super().tearDown()
         db.session.rollback()
