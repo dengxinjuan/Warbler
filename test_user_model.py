@@ -7,6 +7,7 @@
 
 import os
 from unittest import TestCase
+from sqlalchemy import exc
 
 from models import db, User, Message, Follows
 
@@ -34,10 +35,8 @@ class UserModelTestCase(TestCase):
 
     def setUp(self):
         """Create test client, add sample data."""
-
-        User.query.delete()
-        Message.query.delete()
-        Follows.query.delete()
+        db.drop_all()
+        db.create_all()
 
         u1 = User.signup("test1", "email1@email.com", "password", None)
         uid1 = 1111
@@ -60,6 +59,12 @@ class UserModelTestCase(TestCase):
 
         self.client = app.test_client()
 
+    def tearDown(self):
+        res = super().tearDown()
+        db.session.rollback()
+        return res
+
+
     def test_user_model(self):
         """Does basic model work?"""
 
@@ -76,22 +81,11 @@ class UserModelTestCase(TestCase):
         self.assertEqual(len(u.messages), 0)
         self.assertEqual(len(u.followers), 0)
 
-    
-    def test_repr(self):
-        """test repr method works"""
-        u = User(
-            email="test@test.com",
-            username="testuser",
-            password="HASHED_PASSWORD"
-        )
-
-        db.session.add(u)
-        db.session.commit()
-        user = str(u)
-        
-        self.assertIn(": testuser, test@test.com>", user)
-
-    #####following tests#######
+    ####
+    #
+    # Following tests
+    #
+    ####
     def test_user_follows(self):
         self.u1.following.append(self.u2)
         db.session.commit()
@@ -112,101 +106,74 @@ class UserModelTestCase(TestCase):
         self.assertFalse(self.u2.is_following(self.u1))
 
     def test_is_followed_by(self):
-
         self.u1.following.append(self.u2)
         db.session.commit()
 
         self.assertTrue(self.u2.is_followed_by(self.u1))
         self.assertFalse(self.u1.is_followed_by(self.u2))
-    ############################
-    
-    def test_create_user(self):
-        """Testing to make sure I can add a user and authenticate that user"""
-        
-        u3 = User.signup("hawk123", "birdsofwar@gmail.com", "kawkaw", None)
-        password = u3.password
-        db.session.commit()
-        
-        self.assertEqual("hawk123", u3.username)
-        self.assertEqual("birdsofwar@gmail.com", u3.email)
-        self.assertEqual(password, u3.password)
-        
-        self.assertTrue(u3.authenticate("hawk123", "kawkaw"))
-        self.assertFalse(u3.authenticate("hawk123", "meow"))
-        self.assertFalse(u3.authenticate("hawk12", "kawkaw"))
-    
-    #########signup tests###########3
 
+    ####
+    #
+    # Signup Tests
+    #
+    ####
     def test_valid_signup(self):
-        """test whether signup works or not"""
-        test_user = User.signup("testuser","testuser@gmail.com","123456",None)
-        uid=99999
-        test_user.id = uid
+        u_test = User.signup("dengxinjuan", "dengxinjuan@test.com", "password", None)
+        uid = 99999
+        u_test.id = uid
         db.session.commit()
 
-        test_user = User.query.get(uid)
-        self.assertIsNotNone(test_user)
-        self.assertEqual(test_user.username, "testuser")
-        self.assertEqual(test_user.email,"testuser@gmail.com")
-        self.assertEqual(test_user.password,"123456")
-
-        self.assertFalse(test_user.authenticate("testuser","456789"))
-        self.assertTrue(test_user.authenticate("testuser","123456"))
+        u_test = User.query.get(uid)
+        self.assertIsNotNone(u_test)
+        self.assertEqual(u_test.username, "dengxinjuan")
+        self.assertEqual(u_test.email, "dengxinjuan@test.com")
+        self.assertNotEqual(u_test.password, "password")
+      
 
     def test_invalid_username_signup(self):
-        """test invalid username"""
-        invalid_user = User.signup(None,"testuser@gmail.com","password",None)
-        uid = 999999
-        invalid_user.id = uid
+        invalid = User.signup(None, "dengxinjuan@test.com", "password", None)
+        uid = 123456789
+        invalid.id = uid
         with self.assertRaises(exc.IntegrityError) as context:
             db.session.commit()
-    
+
     def test_invalid_email_signup(self):
-        """test invalid email"""
-        invalid_user = User.signup("testuser",None,"password",None)
-        uid = 999999
-        invalid_user.id = uid
+        invalid = User.signup("dengxinjuan", None, "thisispassword", None)
+        uid = 2222222
+        invalid.id = uid
         with self.assertRaises(exc.IntegrityError) as context:
             db.session.commit()
     
     def test_invalid_password_signup(self):
-        """test invalid password"""
         with self.assertRaises(ValueError) as context:
-            User.signup("WillSmith", "FreshPrince@gmail.com", "", None)
-           
+            User.signup("dengxinjuan", "bademail@gmail,com", "", None)
+        
         with self.assertRaises(ValueError) as context:
-            User.signup("testtest", "email@email.com", None, None)
-
-    #########test authentication#######
-
+            User.signup("dengxinjuan", "bademail@gmail.com", None, None)
+    
+    ####
+    #
+    # Authentication Tests
+    #
+    ####
     def test_valid_authentication(self):
         u = User.authenticate(self.u1.username, "password")
         self.assertIsNotNone(u)
         self.assertEqual(u.id, self.uid1)
     
     def test_invalid_username(self):
-        self.assertFalse(User.authenticate("badusername", "password"))
+        self.assertFalse(User.authenticate("somebaduser", "password"))
 
     def test_wrong_password(self):
-        self.assertFalse(User.authenticate(self.u1.username, "badpassword"))
+        self.assertFalse(User.authenticate(self.u1.username, "somethingwrong"))
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
 
         
+
+
+
+
+        
+
