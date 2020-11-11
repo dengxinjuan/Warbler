@@ -140,8 +140,24 @@ class MessageViewTestCase(TestCase):
     def test_unauthorized_message_delete(self):
 
         user2 = User.signup(username="baduser", email="baduser@gmail.com", password="123456",image_url="None")
-        user.id = 22222
-        m = Message( id=1234, text="somethingtext",)
+        user2.id = 22222
+        m = Message( id=1234, text="somethingtext",user_id=self.testuser_id)
+
+        db.session.add_all([user2,m])
+        db.session.commit()
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = 22222
+                resp = c.post("/messages/22222/delete",follow_redirects=True)
+                self.assertEqual(resp.status_code,200)
+                self.assertIn("Access unauthorized",str(resp.data))
+
+                m = Message.query.get(22222)
+                self.assertIsNotNone(m)
+
+    
+
 
 
 
