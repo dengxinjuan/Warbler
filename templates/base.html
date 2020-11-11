@@ -25,6 +25,7 @@
         <img src="/static/images/warbler-logo.png" alt="logo">
         <span>Warbler</span>
       </a>
+      
     </div>
     <ul class="nav navbar-nav navbar-right">
       {% if request.endpoint != None %}
@@ -46,6 +47,10 @@
           <img src="{{ g.user.image_url }}" alt="{{ g.user.username }}">
         </a>
       </li>
+      <li>
+      <a href="/users">
+        <span>All Users</span>
+      </a></li>
       <li><a href="/messages/new">New Message</a></li>
       <li><a href="/logout">Log out</a></li>
       {% endif %}
