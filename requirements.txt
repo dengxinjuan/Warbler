@@ -27,7 +27,7 @@ itsdangerous==0.24
 jedi==0.13.1
 Jinja2==2.10
 lazy-object-proxy==1.4.3
-MarkupSafe==1.0
+
 mccabe==0.6.1
 numpy==1.19.1
 parso==0.3.1
@@ -49,7 +49,7 @@ simplegeneric==0.8.1
 simplejson==3.17.2
 six==1.15.0
 soupsieve==2.0.1
-SQLAlchemy==1.2.12
+
 text-unidecode==1.2
 toml==0.10.1
 torch==1.6.0
@@ -59,7 +59,7 @@ urllib3==1.25.10
 wcwidth==0.1.7
 Werkzeug==0.14.1
 wrapt==1.12.1
-WTForms==2.2.1
+
 
 MarkupSafe==1.1.1
 SQLAlchemy==1.3.20
